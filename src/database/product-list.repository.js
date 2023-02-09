@@ -26,7 +26,7 @@ export class ProductListRepository {
 	 *
 	 * @param {string} listUuid - Uuid of Shopping list
 	 * @param {Array<Product>} products
-	 * @return {Promise<void>}
+	 * @return {Promise<ProductList>}
 	 */
 	async updateProducts(listUuid, products) {
 		return ProductList.findOneAndUpdate({ uuid: listUuid }, { products });

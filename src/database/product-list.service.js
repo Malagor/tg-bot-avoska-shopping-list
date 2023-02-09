@@ -84,7 +84,7 @@ class ProductListService {
 	 *
 	 * @param {string} listId
 	 * @param {Product} product
-	 * @return {Promise<void>}
+	 * @return {Promise<ProductList>}
 	 */
 	async updateProduct(listId, product) {
 		try {

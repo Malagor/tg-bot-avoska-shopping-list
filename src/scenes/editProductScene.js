@@ -5,6 +5,7 @@ import { parseProduct } from '../helpers/parsers.js';
 import { getQueryId, getMessageIdFromQuery, getAdditionDataFromQuery, getChatId } from '../helpers/context.helper.js';
 import { formatProductHTML, formatProductText } from '../formatters/format-product-list.js';
 import { isCancel, sendNotificationMessages, sendCancelMessage } from '../helpers/scenes.helper.js';
+import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 
 const WizardScene = getRequire('telegraf/scenes/wizard');
 
@@ -12,12 +13,12 @@ export const editProductScene = new WizardScene(
 	'editProductScene',
 	async ctx => {
 		try {
-			ctx.session.message_id = getMessageIdFromQuery(ctx);
-			ctx.session.query_id = getQueryId(ctx);
-			ctx.session.chat_id = getChatId(ctx);
-			ctx.session.product_id = getAdditionDataFromQuery(ctx);
+			ctx.session[SESSION_FIELDS.MessageId] = getMessageIdFromQuery(ctx);
+			ctx.session[SESSION_FIELDS.QueryId] = getQueryId(ctx);
+			ctx.session[SESSION_FIELDS.ChatId] = getChatId(ctx);
+			ctx.session[SESSION_FIELDS.ProductId] = getAdditionDataFromQuery(ctx);
 
-			ctx.session.text = ctx.update.callback_query.message.text;
+			ctx.session[SESSION_FIELDS.ProductInfo] = ctx.update.callback_query.message.text;
 
 			await receiveNewProduct(ctx);
 			return ctx.wizard.next();
@@ -58,9 +59,9 @@ async function receiveNewProduct(ctx) {
  */
 async function updateProduct(ctx, product) {
 	try {
-		const { product_id, text } = ctx.session;
+		const { session } = ctx;
 
-		restorePreviousProductId(product, product_id);
+		restorePreviousProductId(product, session[SESSION_FIELDS.ProductId]);
 
 		await updateProductInDB(ctx, product);
 		await editTextProductInChat(ctx, product);

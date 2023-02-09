@@ -10,6 +10,8 @@ import { startCommand } from './commands/start.command.js';
 import { editCommand } from './commands/edit.command.js';
 import { addProductCommand } from './commands/addProduct.command.js';
 import { editProductScene } from './scenes/editProductScene.js';
+import { KEYBOARD as kb } from './constants/keyboard.constants.js';
+
 const { Stage } = getRequire('telegraf');
 const LocalSession = getRequire('telegraf-session-local');
 
@@ -23,8 +25,11 @@ export async function runBot() {
 	bot.start(startCommand);
 	bot.help(helpCommand);
 
-	bot.hears('Показать список', listCommand);
-	bot.hears('Добавить продукты', addProductCommand);
+	bot.hears(kb.Add, addProductCommand);
+	bot.hears(kb.List, listCommand);
+	bot.hears(kb.BuyMode, async ctx => {
+		await listCommand(ctx, { isBuyMode: true });
+	});
 
 	bot.command('list', listCommand);
 	bot.command('keyboard', showKeyboardCommand);

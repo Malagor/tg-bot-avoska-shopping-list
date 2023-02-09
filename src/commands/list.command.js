@@ -1,41 +1,88 @@
 import { productListService } from '../database/product-list.service.js';
-import { formatProductList } from '../formatters/format-product-list.js';
+import { formatProductListWithButtons, formatSimpleProductList } from '../formatters/format-product-list.js';
 import { getUserId, getUserName } from '../helpers/context.helper.js';
 import { mainKeyboard } from '../keyboards/keyboards.js';
+import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 
-export async function listCommand(ctx) {
-	const userId = getUserId(ctx);
-	let list;
+/**
+ *
+ * @param ctx
+ * @param {{isBuyMode: boolean}}options
+ * @return {Promise<void>}
+ */
+export async function listCommand(ctx, { isBuyMode }) {
+	try {
+		const userId = getUserId(ctx);
+		const listUuid = ctx.session[SESSION_FIELDS.ShoppingListId];
+		let list = await getShoppingList(listUuid, userId);
 
-	const listUuid = ctx.session.shoppingList_id;
+		if (!list) {
+			list = await createNewShoppingList(ctx, userId);
 
-	if (listUuid) {
-		list = await productListService.getProductListByUuid(listUuid);
-	} else {
-		list = await productListService.getProductListByUserId(userId);
+			if (!list) {
+				sendMessage(ctx, `Не удалось получить или создать список для пользователя. Попробуйте позже`);
+				return;
+			}
+		}
+
+		saveShoppingListId(ctx, list.uuid);
+
+		if (!list.products.length) {
+			sendMessage(ctx, 'Нет списка продуктов для отображения');
+			return;
+		}
+
+		if (isBuyMode) {
+			await formatProductListWithButtons(ctx, list.products);
+		} else {
+			await formatSimpleProductList(ctx, list.products);
+		}
+	} catch (e) {
+		console.log(e);
 	}
+}
 
-	if (!list) {
-		console.log('Не удалось найти список продуктов. Создаю новый!');
-		const userName = getUserName(ctx);
-		list = await productListService.createList(`Спискок пользователя ${userName}`, userId);
-	}
+/**
+ *
+ * @param {string} listUuid
+ * @param {number} userId
+ * @return {Promise<ProductList>}
+ */
+async function getShoppingList(listUuid, userId) {
+	return listUuid
+		? productListService.getProductListByUuid(listUuid)
+		: productListService.getProductListByUserId(userId);
+}
 
-	if (!list) {
-		ctx.reply(`Не удалось получить или создать список для пользователя. Попробуйте позже`, {
-			reply_markup: mainKeyboard,
-		});
-	}
+/**
+ *
+ * @param ctx
+ * @param {number} userId
+ * @return {Promise<ProductList>}
+ */
+async function createNewShoppingList(ctx, userId) {
+	console.log('Не удалось найти список продуктов. Создаю новый!');
+	const userName = getUserName(ctx);
 
-	ctx.session.shoppingList_id = list.uuid;
+	return productListService.createList(`Спискок пользователя ${userName}`, userId);
+}
 
-	if (!list.products.length) {
-		ctx.reply('Нет списка продуктов для отображения', {
-			reply_markup: mainKeyboard,
-		});
+/**
+ *
+ * @param ctx
+ * @param {string} listUuid
+ */
+function saveShoppingListId(ctx, listUuid) {
+	ctx.session[SESSION_FIELDS.ShoppingListId] = listUuid;
+}
 
-		return;
-	}
-
-	formatProductList(ctx, list.products);
+/**
+ *
+ * @param ctx
+ * @param {string} text
+ */
+function sendMessage(ctx, text) {
+	ctx.reply(text, {
+		reply_markup: mainKeyboard,
+	});
 }

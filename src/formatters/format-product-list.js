@@ -1,21 +1,31 @@
 /**
  *
  * @param ctx
- * @param {Array<{title: string, count: number}>}products
+ * @param {Array<Product>}products
  */
 import { getProductKeyboard } from '../keyboards/keyboards.js';
 
-export async function formatProductList(ctx, products) {
+export async function formatProductListWithButtons(ctx, products) {
 	for (const product of products) {
-		await formatProduct(ctx, product);
+		await formatProductWithButtons(ctx, product);
 	}
+}
+
+export async function formatSimpleProductList(ctx, products) {
+	let html = '';
+
+	for (const product of products) {
+		html += formatProductHTML(product) + '\n';
+	}
+
+	await ctx.replyWithHTML(html);
 }
 
 /**
  * @param ctx
  * @param {{uuid: string, title: string, count: number}} product
  */
-async function formatProduct(ctx, product) {
+async function formatProductWithButtons(ctx, product) {
 	const html = formatProductHTML(product);
 
 	await ctx.replyWithHTML(html, {
@@ -24,7 +34,7 @@ async function formatProduct(ctx, product) {
 }
 
 /**
- * @param {{uuid: string, title: string, count: number}} product
+ * @param {Product} product
  * @return {string}
  */
 export function formatProductHTML(product) {
@@ -32,7 +42,7 @@ export function formatProductHTML(product) {
 }
 
 /**
- * @param {{uuid: string, title: string, count: number}} product
+ * @param {Product} product
  * @return {string}
  */
 export function formatProductText(product) {

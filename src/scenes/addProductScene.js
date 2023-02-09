@@ -5,6 +5,7 @@ import { parseProductList } from '../helpers/parsers.js';
 import { isCancel, sendNotificationMessages, sendCancelMessage } from '../helpers/scenes.helper.js';
 import { getQueryId, getChatId } from '../helpers/context.helper.js';
 import { isQueryContext } from '../helpers/type-guards.js';
+import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 
 const WizardScene = getRequire('telegraf/scenes/wizard');
 
@@ -12,9 +13,9 @@ export const addProductScene = new WizardScene(
 	'addProductScene',
 	async ctx => {
 		try {
-			ctx.session.query_id = isQueryContext(ctx) ? getQueryId(ctx) : undefined;
+			ctx.session[SESSION_FIELDS.QueryId] = isQueryContext(ctx) ? getQueryId(ctx) : undefined;
 
-			ctx.session.chat_id = getChatId(ctx);
+			ctx.session[SESSION_FIELDS.ChatId] = getChatId(ctx);
 
 			await receiveProducts(ctx);
 
@@ -60,7 +61,7 @@ async function receiveProducts(ctx) {
  * @return {Promise<void>}
  */
 async function addProducts(ctx, products) {
-	const { shoppingList_id } = ctx.session;
+	const { session } = ctx;
 
-	await productListService.addProducts(shoppingList_id, products);
+	await productListService.addProducts(session[SESSION_FIELDS.ShoppingListId], products);
 }

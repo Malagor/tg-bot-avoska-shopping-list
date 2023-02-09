@@ -1,5 +1,6 @@
-import { getAdditionDataFromQuery, getQueryId } from '../helpers/context.helper.js';
+import { getAdditionDataFromQuery, getText } from '../helpers/context.helper.js';
 import { productListService } from '../database/product-list.service.js';
+import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 
 /**
  *
@@ -8,13 +9,14 @@ import { productListService } from '../database/product-list.service.js';
  */
 export async function buyCommand(ctx) {
 	try {
-		const { shoppingList_id } = ctx.session;
+		const { session } = ctx;
+		const product = getText(ctx);
 
-		await productListService.deleteProduct(shoppingList_id, getAdditionDataFromQuery(ctx));
+		await productListService.deleteProduct(session[SESSION_FIELDS.ShoppingListId], getAdditionDataFromQuery(ctx));
 
 		await ctx.deleteMessage();
 
-		await ctx.answerCbQuery(getQueryId(ctx), 'Продукт куплен', true);
+		await ctx.reply(`Куплен продукт => ${product}`);
 	} catch (e) {
 		console.log(e);
 	}

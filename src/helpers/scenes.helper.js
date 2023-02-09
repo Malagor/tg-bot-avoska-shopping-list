@@ -1,4 +1,5 @@
 import { mainKeyboard } from '../keyboards/keyboards.js';
+import { KEYBOARD } from '../constants/keyboard.constants.js';
 
 /**
  *
@@ -35,5 +36,5 @@ export async function sendCancelMessage(ctx) {
  * @return {boolean}
  */
 export function isCancel(text) {
-	return text === 'Отменить' || text === '/cancel';
+	return text === KEYBOARD.Cancel || text === '/cancel';
 }

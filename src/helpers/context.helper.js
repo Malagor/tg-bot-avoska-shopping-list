@@ -75,3 +75,13 @@ export function getAdditionDataFromQuery(ctx) {
 export function getMessageIdFromQuery(ctx) {
 	return ctx?.update?.callback_query?.message.message_id;
 }
+
+export function getText(ctx) {
+	if (isQueryContext(ctx)) {
+		return ctx.update?.callback_query.message?.text;
+	}
+
+	if (isMessageContext(ctx)) {
+		return ctx.update?.message?.text;
+	}
+}
