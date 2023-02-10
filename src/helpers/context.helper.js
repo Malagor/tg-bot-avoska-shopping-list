@@ -4,6 +4,7 @@
  * @return {number}
  */
 import { isQueryContext, isMessageContext } from './type-guards.js';
+import { KEYBOARD } from '../keyboards/keyboards.js';
 
 export function getUserId(ctx) {
 	const id = ctx.update?.message?.from?.id;
@@ -83,5 +84,34 @@ export function getText(ctx) {
 
 	if (isMessageContext(ctx)) {
 		return ctx.update?.message?.text;
+	}
+}
+
+/**
+ *
+ * @param ctx
+ * @param {string} html
+ * @param {{kbName: string, kbArgs: string}} options - keyboard options
+ * @return {Promise<void>}
+ */
+export async function sendMessage(ctx, html, { kbName, kbArgs = '' } = {}) {
+	let keyboard = KEYBOARD[kbName];
+
+	if (!keyboard) {
+		console.error('Не найдена клавиатура для сообщения');
+	} else {
+		if (typeof keyboard === 'function') {
+			keyboard = KEYBOARD[kbName](kbArgs);
+		} else {
+			keyboard = KEYBOARD[kbName];
+		}
+	}
+
+	if (keyboard) {
+		await ctx.replyWithHTML(html, {
+			reply_markup: keyboard,
+		});
+	} else {
+		await ctx.replyWithHTML(html);
 	}
 }

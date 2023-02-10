@@ -1,35 +1,44 @@
-import { ProductListRepository } from './product-list.repository.js';
-import { createQueryForProductLists } from '../helpers/product-list-service.helper.js';
+import { ShoppingListRepository } from './shopping-list.repository.js';
+import { createQueryForShoppingLists } from '../helpers/shopping-list-service.helper.js';
 
-class ProductListService {
-	repository;
-
+/**
+ * Class representing a ShoppingListService.
+ */
+class ShoppingListService {
 	/**
 	 *
-	 * @param {ProductListRepository} repository
+	 * @param {ShoppingListRepository} repository
 	 */
 	constructor(repository) {
 		this.repository = repository;
 	}
 
+	/**
+	 * @type {ShoppingListService}
+	 * @static
+	 */
 	static instance;
 
+	/**
+	 * Generates ShoppingListService instances.
+	 * @static
+	 */
 	static getInstance() {
-		if (!ProductListService.instance) {
-			ProductListService.instance = new ProductListService(new ProductListRepository());
+		if (!ShoppingListService.instance) {
+			ShoppingListService.instance = new ShoppingListService(new ShoppingListRepository());
 		}
 
-		return ProductListService.instance;
+		return ShoppingListService.instance;
 	}
 
 	/**
 	 *
 	 * @param userId
-	 * @return {Promise<ProductList>}
+	 * @return {Promise<Array<ShoppingList>|null>}
 	 */
-	async getProductListByUserId(userId) {
+	async getAllShoppingListByUserId(userId) {
 		try {
-			return this.repository.getList(createQueryForProductLists(userId));
+			return this.repository.getAllLists(createQueryForShoppingLists(userId));
 		} catch (e) {
 			console.log(e);
 		}
@@ -38,9 +47,9 @@ class ProductListService {
 	/**
 	 *
 	 * @param {string} uuid
-	 * @return {Promise<ProductList>}
+	 * @return {Promise<ShoppingList>}
 	 */
-	async getProductListByUuid(uuid) {
+	async getShoppingListByUuid(uuid) {
 		try {
 			return this.repository.getList({ uuid });
 		} catch (e) {
@@ -52,11 +61,19 @@ class ProductListService {
 	 *
 	 * @param {string} name
 	 * @param {number} userId
-	 * @return {Promise<*>}
+	 * @return {Promise<ShoppingList>}
 	 */
 	async createList(name, userId) {
 		try {
 			return this.repository.createList(name, userId);
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	async deleteList(uuid) {
+		try {
+			await this.repository.deleteList(uuid);
 		} catch (e) {
 			console.log(e);
 		}
@@ -84,7 +101,7 @@ class ProductListService {
 	 *
 	 * @param {string} listId
 	 * @param {Product} product
-	 * @return {Promise<ProductList>}
+	 * @return {Promise<ShoppingList>}
 	 */
 	async updateProduct(listId, product) {
 		try {
@@ -119,6 +136,24 @@ class ProductListService {
 			console.log(e);
 		}
 	}
+
+	/**
+	 *
+	 * @param {string} listUuid
+	 * @param {string} name
+	 * @return {Promise<ShoppingList>}
+	 */
+	async updateListName(listUuid, name) {
+		try {
+			return this.repository.updateList(listUuid, { name });
+		} catch (e) {
+			console.log(e);
+		}
+	}
 }
 
-export const productListService = ProductListService.getInstance();
+/**
+ * @constant
+ * @type {ShoppingListService}
+ */
+export const shoppingListService = ShoppingListService.getInstance();

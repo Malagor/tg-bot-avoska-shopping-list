@@ -1,42 +1,47 @@
 import Telegraf from 'telegraf';
 import { getConfig } from './config/config.service.js';
-import { listCommand } from './commands/list.command.js';
-import { buyCommand } from './commands/buy.command.js';
-import { showKeyboardCommand } from './commands/showKeyboard.command.js';
-import { addProductScene } from './scenes/addProductScene.js';
-import { getRequire } from './helpers/requireHook.js';
-import { helpCommand } from './commands/help.command.js';
-import { startCommand } from './commands/start.command.js';
-import { editCommand } from './commands/edit.command.js';
-import { addProductCommand } from './commands/addProduct.command.js';
-import { editProductScene } from './scenes/editProductScene.js';
-import { KEYBOARD as kb } from './constants/keyboard.constants.js';
+import { getRequire } from './helpers/require-hook.js';
+import * as commands from './commands/index.js';
+import { KEYBOARD_BUTTON as kb } from './constants/keyboard.constants.js';
+import { addScenes } from './helpers/bot.helper.js';
 
-const { Stage } = getRequire('telegraf');
 const LocalSession = getRequire('telegraf-session-local');
 
 export async function runBot() {
 	const bot = new Telegraf(getConfig('BOT_TOKEN'));
-	const stage = new Stage([addProductScene, editProductScene]);
+	const stage = addScenes();
 
 	bot.use(new LocalSession({ database: 'session.json' }).middleware());
 	bot.use(stage.middleware());
 
-	bot.start(startCommand);
-	bot.help(helpCommand);
+	bot.start(commands.startCommand);
+	bot.help(commands.helpCommand);
 
-	bot.hears(kb.Add, addProductCommand);
-	bot.hears(kb.List, listCommand);
+	bot.hears(kb.Add, commands.addProductCommand);
+	bot.hears(kb.List, commands.listCommand);
 	bot.hears(kb.BuyMode, async ctx => {
-		await listCommand(ctx, { isBuyMode: true });
+		await commands.listCommand(ctx, { isBuyMode: true });
 	});
 
-	bot.command('list', listCommand);
-	bot.command('keyboard', showKeyboardCommand);
-	bot.command('add', addProductCommand);
+	// LISTS
+	bot.hears(kb.Back, commands.backCommand);
+	bot.hears(kb.GetAllLists, commands.allListCommand);
+	bot.hears(kb.ShowAllLists, commands.showAllListsCommand);
+	bot.hears(kb.ShowCurrentList, commands.currentListCommand);
+	bot.hears(kb.Create, commands.createListCommand);
 
-	bot.action(/^edit-(.+)$/, editCommand);
-	bot.action(/^buy-(.+)$/, buyCommand);
+	// COMMANDS
+	bot.command('list', commands.listCommand);
+	bot.command('keyboard', commands.showKeyboardCommand);
+	bot.command('add', commands.addProductCommand);
+	bot.command('showLists', commands.allListCommand);
+
+	// ACTIONS
+	bot.action(/^edit-(.+)$/, commands.editCommand);
+	bot.action(/^buy-(.+)$/, commands.buyCommand);
+	bot.action(/^select-(.+)$/, commands.selectCurrentList);
+	bot.action(/^rename-(.+)$/, commands.renameListCommand);
+	bot.action(/^delete-(.+)$/, commands.deleteListCommand);
 
 	bot.launch()
 		.then(() => {

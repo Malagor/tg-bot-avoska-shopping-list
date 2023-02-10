@@ -5,4 +5,5 @@ export const SESSION_FIELDS = {
 	ProductId: 'product_id',
 	ProductInfo: 'product_info',
 	ShoppingListId: 'shopping_list_id',
+	ShoppingListName: 'shopping_list_name',
 };

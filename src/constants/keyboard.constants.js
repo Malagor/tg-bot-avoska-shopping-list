@@ -1,8 +1,19 @@
-export const KEYBOARD = {
+export const KEYBOARD_BUTTON = {
 	Edit: 'Редактировать',
 	Add: 'Добавить продукты',
 	List: 'Список продуктов',
 	Buy: 'Купить',
 	Cancel: 'Отменить',
 	BuyMode: 'Расширнный список',
+	Back: 'На главный экран',
+	GetAllLists: 'Все списки',
+	ShareList: 'Поделиться',
+	RenameList: 'Переименовать',
+	NewList: 'Создать новый',
+	ShowCurrentList: 'Текущий',
+	ShowAllLists: 'Показать все',
+	DeleteList: 'Удалить',
+	SelectCurrent: 'Выбрать текущим',
+	Create: 'Создать новый',
+	Yes: 'Да, подтверждаю',
 };

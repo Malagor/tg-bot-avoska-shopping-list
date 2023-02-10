@@ -1,6 +1,6 @@
-import { getRequire } from '../helpers/requireHook.js';
-import { productListService } from '../database/product-list.service.js';
-import { cancelKeyboard } from '../keyboards/keyboards.js';
+import { getRequire } from '../helpers/require-hook.js';
+import { shoppingListService } from '../database/shopping-list.service.js';
+import { KEYBOARD } from '../keyboards/keyboards.js';
 import { parseProductList } from '../helpers/parsers.js';
 import { isCancel, sendNotificationMessages, sendCancelMessage } from '../helpers/scenes.helper.js';
 import { getQueryId, getChatId } from '../helpers/context.helper.js';
@@ -29,7 +29,7 @@ export const addProductScene = new WizardScene(
 			const text = ctx.message.text;
 
 			if (isCancel(text)) {
-				await sendCancelMessage(ctx);
+				await sendCancelMessage(ctx, 'main');
 
 				return ctx.scene.leave();
 			}
@@ -49,7 +49,7 @@ async function receiveProducts(ctx) {
 	await ctx.replyWithHTML(
 		`Введите продукты в формате <b>"Продукт Количество"</b>. Можно ввести несколько продуктов - <b>каждый с новой строки</b>`,
 		{
-			reply_markup: cancelKeyboard,
+			reply_markup: KEYBOARD.cancel,
 		}
 	);
 }
@@ -63,5 +63,5 @@ async function receiveProducts(ctx) {
 async function addProducts(ctx, products) {
 	const { session } = ctx;
 
-	await productListService.addProducts(session[SESSION_FIELDS.ShoppingListId], products);
+	await shoppingListService.addProducts(session[SESSION_FIELDS.ShoppingListId], products);
 }

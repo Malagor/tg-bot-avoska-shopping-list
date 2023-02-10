@@ -1,5 +1,5 @@
-import { mainKeyboard } from '../keyboards/keyboards.js';
-import { KEYBOARD } from '../constants/keyboard.constants.js';
+import { KEYBOARD_BUTTON as kb } from '../constants/keyboard.constants.js';
+import { sendMessage } from './context.helper.js';
 
 /**
  *
@@ -14,20 +14,17 @@ export async function sendNotificationMessages(ctx, text) {
 		await ctx.telegram.answerCbQuery(query_id, text);
 	}
 
-	await ctx.replyWithHTML(text, {
-		reply_markup: mainKeyboard,
-	});
+	await sendMessage(ctx, text, { kbName: 'main' });
 }
 
 /**
  *
  * @param ctx
+ * @param {string} kbName
  * @return {Promise<void>}
  */
-export async function sendCancelMessage(ctx) {
-	await ctx.replyWithHTML('Операция отменена', {
-		reply_markup: mainKeyboard,
-	});
+export async function sendCancelMessage(ctx, kbName = '') {
+	await sendMessage(ctx, 'Операция отменена', { kbName });
 }
 
 /**
@@ -36,5 +33,5 @@ export async function sendCancelMessage(ctx) {
  * @return {boolean}
  */
 export function isCancel(text) {
-	return text === KEYBOARD.Cancel || text === '/cancel';
+	return text === kb.Cancel || text === '/cancel';
 }

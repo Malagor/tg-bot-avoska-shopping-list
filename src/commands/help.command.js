@@ -1,4 +1,4 @@
-import { mainKeyboard } from '../keyboards/keyboards.js';
+import { KEYBOARD } from '../keyboards/keyboards.js';
 
 export function helpCommand(ctx) {
 	ctx.reply(
@@ -9,7 +9,7 @@ export function helpCommand(ctx) {
 			'/add - добавить продукт в список\n' +
 			'/cancel - отменить текущую операцию',
 		{
-			reply_markup: mainKeyboard,
+			reply_markup: KEYBOARD.main,
 		}
 	);
 }

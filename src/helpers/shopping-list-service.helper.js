@@ -3,7 +3,7 @@
  * @param {number} userId
  * @return {{userIds: {$all: [string]}}}
  */
-export function createQueryForProductLists(userId) {
+export function createQueryForShoppingLists(userId) {
 	return {
 		userIds: {
 			$all: [`${userId}`],

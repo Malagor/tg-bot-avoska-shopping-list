@@ -3,11 +3,11 @@
  * @param ctx
  * @param {Array<Product>}products
  */
-import { getProductKeyboard } from '../keyboards/keyboards.js';
+import { sendMessage } from '../helpers/context.helper.js';
 
 export async function formatProductListWithButtons(ctx, products) {
 	for (const product of products) {
-		await formatProductWithButtons(ctx, product);
+		await sendProductWithButtons(ctx, product);
 	}
 }
 
@@ -25,12 +25,10 @@ export async function formatSimpleProductList(ctx, products) {
  * @param ctx
  * @param {{uuid: string, title: string, count: number}} product
  */
-async function formatProductWithButtons(ctx, product) {
+async function sendProductWithButtons(ctx, product) {
 	const html = formatProductHTML(product);
 
-	await ctx.replyWithHTML(html, {
-		reply_markup: getProductKeyboard(product),
-	});
+	await sendMessage(ctx, html, { kbName: 'product', kbArgs: product.uuid });
 }
 
 /**

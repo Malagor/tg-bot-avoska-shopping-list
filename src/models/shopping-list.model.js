@@ -9,7 +9,7 @@ import mongoose, { Schema } from 'mongoose';
  */
 
 /**
- * @typedef ProductList
+ * @typedef ShoppingList
  * @type {object}
  * @property {string} uuid - an ID.
  * @property {string} name - title of product list.
@@ -17,7 +17,7 @@ import mongoose, { Schema } from 'mongoose';
  * @property {Array<Product>} products - array of products
  */
 
-const ProductList = new Schema({
+const ShoppingList = new Schema({
 	uuid: {
 		type: String,
 		required: true,
@@ -47,4 +47,4 @@ const ProductList = new Schema({
 	],
 });
 
-mongoose.model('productLists', ProductList);
+mongoose.model('shoppingLists', ShoppingList);

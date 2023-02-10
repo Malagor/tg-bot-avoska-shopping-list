@@ -1,5 +1,5 @@
 import { getAdditionDataFromQuery, getText } from '../helpers/context.helper.js';
-import { productListService } from '../database/product-list.service.js';
+import { shoppingListService } from '../database/shopping-list.service.js';
 import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 
 /**
@@ -12,7 +12,7 @@ export async function buyCommand(ctx) {
 		const { session } = ctx;
 		const product = getText(ctx);
 
-		await productListService.deleteProduct(session[SESSION_FIELDS.ShoppingListId], getAdditionDataFromQuery(ctx));
+		await shoppingListService.deleteProduct(session[SESSION_FIELDS.ShoppingListId], getAdditionDataFromQuery(ctx));
 
 		await ctx.deleteMessage();
 

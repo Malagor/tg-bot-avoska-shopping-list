@@ -1,1 +1,1 @@
-import './productList.model.js';
+import './shopping-list.model.js';
