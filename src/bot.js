@@ -5,6 +5,7 @@ import { commandHandlerList } from './handlers/command-handler-list.js';
 import { hearsHandlerList } from './handlers/hears-handler-list.js';
 import { getRequire } from './helpers/require-hook.js';
 import { updateHandlerList } from './handlers/update-handler-list.js';
+import { botCommands } from './constants/commands.constant.js';
 
 const { Stage } = getRequire('telegraf');
 
@@ -18,12 +19,18 @@ export default class Bot {
 	}
 
 	init() {
-		this.bot.use(new LocalSession({ database: 'session.json' }).middleware());
-		this.bot.use(this.addScenes().middleware());
+		try {
+			this.bot.use(new LocalSession({ database: 'session.json' }).middleware());
+			this.bot.use(this.addScenes().middleware());
 
-		this.addListeners().catch(e => {
+			this.addListeners();
+
+			this.bot.telegram.setMyCommands(botCommands).catch(e => {
+				throw new Error(`Не удалось задать комманды бота\n${e}`);
+			});
+		} catch (e) {
 			console.log(e);
-		});
+		}
 	}
 
 	launch() {
@@ -51,32 +58,32 @@ export default class Bot {
 		return new Stage(stages);
 	}
 
-	async addListeners() {
-		await this.connectHears();
-		await this.connectCommands();
-		await this.connectActions();
-		await this.connectUpdateHandlers();
+	addListeners() {
+		this.connectHears();
+		this.connectCommands();
+		this.connectActions();
+		this.connectUpdateHandlers();
 	}
 
-	async connectActions() {
+	connectActions() {
 		for (const action in actionHandlerList) {
 			this.bot.action(this.createTrigger(action), actionHandlerList[action]);
 		}
 	}
 
-	async connectCommands() {
+	connectCommands() {
 		for (const command in commandHandlerList) {
 			this.bot.command(command, commandHandlerList[command]);
 		}
 	}
 
-	async connectHears() {
+	connectHears() {
 		for (const hears in hearsHandlerList) {
 			this.bot.hears(hears, hearsHandlerList[hears]);
 		}
 	}
 
-	async connectUpdateHandlers() {
+	connectUpdateHandlers() {
 		for (const updateType in updateHandlerList) {
 			this.bot.on(updateType, updateHandlerList[updateType]);
 		}
