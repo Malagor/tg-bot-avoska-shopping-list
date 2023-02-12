@@ -1,5 +1,5 @@
-import { KEYBOARD } from '../keyboards/keyboards.js';
-import { getRequire } from '../helpers/require-hook.js';
+import { KEYBOARD } from '../../keyboards/keyboards.js';
+import { getRequire } from '../../helpers/require-hook.js';
 
 const { Extra } = getRequire('telegraf');
 

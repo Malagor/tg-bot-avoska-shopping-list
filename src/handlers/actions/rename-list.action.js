@@ -1,4 +1,4 @@
-export async function renameListCommand(ctx) {
+export async function renameListAction(ctx) {
 	try {
 		await ctx.scene.enter('renameListScene');
 	} catch (e) {

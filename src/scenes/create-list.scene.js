@@ -50,7 +50,6 @@ async function receiveListName(ctx) {
  * @return {Promise<void>}
  */
 async function createList(ctx, name) {
-	const { session } = ctx;
 	const list = await shoppingListService.createList(name, helper.getUserId(ctx));
 
 	if (!list) {
@@ -60,8 +59,20 @@ async function createList(ctx, name) {
 		return;
 	}
 
-	session[SESSION_FIELDS.ShoppingListId] = list.uuid;
+	saveCurrentListId(ctx, list.uuid);
+
 	const html = `Новый список с именем ${list.name} создан и установлен как текущий.`;
 
 	await helper.sendMessage(ctx, html, { kbName: 'lists' });
+}
+
+/**
+ *
+ * @param ctx
+ * @param {string} uuid
+ */
+function saveCurrentListId(ctx, uuid) {
+	const { session } = ctx;
+
+	session[SESSION_FIELDS.CurrentListId] = uuid;
 }

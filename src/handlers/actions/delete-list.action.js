@@ -1,4 +1,4 @@
-export async function deleteListCommand(ctx) {
+export async function deleteListAction(ctx) {
 	try {
 		await ctx.scene.enter('deleteListScene');
 	} catch (e) {

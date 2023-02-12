@@ -1,8 +1,8 @@
-import { getAdditionDataFromQuery, sendMessage } from '../helpers/context.helper.js';
-import { shoppingListService } from '../database/shopping-list.service.js';
-import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
+import { getAdditionDataFromQuery, sendMessage } from '../../helpers/context.helper.js';
+import { shoppingListService } from '../../database/shopping-list.service.js';
+import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 
-export async function selectCurrentList(ctx) {
+export async function selectCurrentListAction(ctx) {
 	try {
 		const listUuid = getAdditionDataFromQuery(ctx);
 
@@ -15,7 +15,7 @@ export async function selectCurrentList(ctx) {
 
 		const list = await shoppingListService.getShoppingListByUuid(listUuid);
 
-		ctx.session[SESSION_FIELDS.ShoppingListId] = list.uuid;
+		ctx.session[SESSION_FIELDS.CurrentListId] = list.uuid;
 
 		await sendMessage(ctx, `Список <b>${list.name}</b> теперь текущий.`, { kbName: 'lists', kbArgs: list.uuid });
 	} catch (e) {

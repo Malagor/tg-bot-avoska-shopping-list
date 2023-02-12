@@ -2,7 +2,7 @@ import { getConfig } from './config/config.service.js';
 
 import mongoose from 'mongoose';
 import './models/index.js';
-import { runBot } from './bot.js';
+import Bot from './bot.js';
 
 mongoose.set('strictQuery', false);
 mongoose
@@ -13,7 +13,7 @@ mongoose
 		console.log('Connection to the database was successful!');
 	})
 	.then(async () => {
-		await runBot();
+		new Bot(getConfig('BOT_TOKEN')).launch();
 	})
 	.catch(e => {
 		console.log(e);

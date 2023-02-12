@@ -1,6 +1,6 @@
-import { getAdditionDataFromQuery, getText } from '../helpers/context.helper.js';
-import { shoppingListService } from '../database/shopping-list.service.js';
-import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
+import { getAdditionDataFromQuery, getText } from '../../helpers/context.helper.js';
+import { shoppingListService } from '../../database/shopping-list.service.js';
+import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 
 /**
  *

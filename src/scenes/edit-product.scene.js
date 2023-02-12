@@ -1,11 +1,11 @@
 import { getRequire } from '../helpers/require-hook.js';
 import { shoppingListService } from '../database/shopping-list.service.js';
 import { KEYBOARD } from '../keyboards/keyboards.js';
-import { parseProduct } from '../helpers/parsers.js';
-import * as contextHelpers from '../helpers/context.helper.js';
-import { formatProductHTML, formatProductText } from '../formatters/format-product-list.js';
-import * as sceneHelpers from '../helpers/scenes.helper.js';
 import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
+import { parseProduct } from '../helpers/parsers.js';
+import * as ctxHelper from '../helpers/context.helper.js';
+import * as sceneHelper from '../helpers/scenes.helper.js';
+import { formatProductHTML, formatProductText } from '../formatters/format-product-list.js';
 
 const WizardScene = getRequire('telegraf/scenes/wizard');
 
@@ -13,12 +13,7 @@ export const editProductScene = new WizardScene(
 	'editProductScene',
 	async ctx => {
 		try {
-			ctx.session[SESSION_FIELDS.MessageId] = contextHelpers.getMessageIdFromQuery(ctx);
-			ctx.session[SESSION_FIELDS.QueryId] = contextHelpers.getQueryId(ctx);
-			ctx.session[SESSION_FIELDS.ChatId] = contextHelpers.getChatId(ctx);
-			ctx.session[SESSION_FIELDS.ProductId] = contextHelpers.getAdditionDataFromQuery(ctx);
-
-			ctx.session[SESSION_FIELDS.ProductInfo] = contextHelpers.getText(ctx);
+			saveSessionData(ctx);
 
 			await receiveNewProduct(ctx);
 			return ctx.wizard.next();
@@ -30,8 +25,8 @@ export const editProductScene = new WizardScene(
 		try {
 			const text = ctx.message.text;
 
-			if (sceneHelpers.isCancel(text)) {
-				await sceneHelpers.sendCancelMessage(ctx, 'main');
+			if (sceneHelper.isCancel(text)) {
+				await sceneHelper.sendCancelMessage(ctx, 'main');
 
 				return ctx.scene.leave();
 			}
@@ -47,7 +42,7 @@ export const editProductScene = new WizardScene(
 
 async function receiveNewProduct(ctx) {
 	const html = 'Введите измененные данные в формате <b>"Продукт Количество"</b>.';
-	await contextHelpers.sendMessage(ctx, html, { kbName: 'cancel' });
+	await ctxHelper.sendMessage(ctx, html, { kbName: 'cancel' });
 }
 
 /**
@@ -64,7 +59,7 @@ async function updateProduct(ctx, product) {
 
 		await updateProductInDB(ctx, product);
 		await editTextProductInChat(ctx, product);
-		await sceneHelpers.sendNotificationMessages(
+		await sceneHelper.sendNotificationMessages(
 			ctx,
 			`Продукт изменен.\n${session[SESSION_FIELDS.ProductInfo]} => ${formatProductText(product)}`
 		);
@@ -113,4 +108,12 @@ async function updateProductInDB(ctx, product) {
 	const { session } = ctx;
 
 	await shoppingListService.updateProduct(session[SESSION_FIELDS.ShoppingListId], product);
+}
+
+function saveSessionData(ctx) {
+	ctx.session[SESSION_FIELDS.MessageId] = ctxHelper.getMessageIdFromQuery(ctx);
+	ctx.session[SESSION_FIELDS.QueryId] = ctxHelper.getQueryId(ctx);
+	ctx.session[SESSION_FIELDS.ChatId] = ctxHelper.getChatId(ctx);
+	ctx.session[SESSION_FIELDS.ProductId] = ctxHelper.getAdditionDataFromQuery(ctx);
+	ctx.session[SESSION_FIELDS.ProductInfo] = ctxHelper.getText(ctx);
 }

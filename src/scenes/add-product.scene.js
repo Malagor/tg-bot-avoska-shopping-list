@@ -2,7 +2,7 @@ import { getRequire } from '../helpers/require-hook.js';
 import { shoppingListService } from '../database/shopping-list.service.js';
 import { KEYBOARD } from '../keyboards/keyboards.js';
 import { parseProductList } from '../helpers/parsers.js';
-import { isCancel, sendNotificationMessages, sendCancelMessage } from '../helpers/scenes.helper.js';
+import * as helper from '../helpers/scenes.helper.js';
 import { getQueryId, getChatId } from '../helpers/context.helper.js';
 import { isQueryContext } from '../helpers/type-guards.js';
 import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
@@ -13,10 +13,8 @@ export const addProductScene = new WizardScene(
 	'addProductScene',
 	async ctx => {
 		try {
-			ctx.session[SESSION_FIELDS.QueryId] = isQueryContext(ctx) ? getQueryId(ctx) : undefined;
-
-			ctx.session[SESSION_FIELDS.ChatId] = getChatId(ctx);
-
+			saveQueryId(ctx);
+			saveChatId(ctx);
 			await receiveProducts(ctx);
 
 			return ctx.wizard.next();
@@ -28,15 +26,15 @@ export const addProductScene = new WizardScene(
 		try {
 			const text = ctx.message.text;
 
-			if (isCancel(text)) {
-				await sendCancelMessage(ctx, 'main');
+			if (helper.isCancel(text)) {
+				await helper.sendCancelMessage(ctx, 'main');
 
 				return ctx.scene.leave();
 			}
 
 			await addProducts(ctx, parseProductList(text));
 
-			await sendNotificationMessages(ctx, 'Продукты добавлены');
+			await helper.sendNotificationMessages(ctx, 'Продукты добавлены');
 
 			return ctx.scene.leave();
 		} catch (e) {
@@ -64,4 +62,12 @@ async function addProducts(ctx, products) {
 	const { session } = ctx;
 
 	await shoppingListService.addProducts(session[SESSION_FIELDS.ShoppingListId], products);
+}
+
+function saveQueryId(ctx) {
+	ctx.session[SESSION_FIELDS.QueryId] = isQueryContext(ctx) ? getQueryId(ctx) : undefined;
+}
+
+function saveChatId(ctx) {
+	ctx.session[SESSION_FIELDS.ChatId] = getChatId(ctx);
 }

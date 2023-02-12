@@ -3,11 +3,17 @@
  * @param ctx
  * @return {number}
  */
-import { isQueryContext, isMessageContext } from './type-guards.js';
+import { isInlineQuery, isMessageContext, isQueryContext } from './type-guards.js';
 import { KEYBOARD } from '../keyboards/keyboards.js';
 
 export function getUserId(ctx) {
-	const id = ctx.update?.message?.from?.id;
+	let id;
+
+	if (isMessageContext(ctx)) {
+		id = ctx.update?.message?.from?.id;
+	} else if (isInlineQuery(ctx)) {
+		id = ctx.update.inline_query.from.id;
+	}
 
 	if (!id) {
 		throw new Error('Не получилось извлечь ID пользователя из контекста');

@@ -1,4 +1,4 @@
-import { KEYBOARD } from '../keyboards/keyboards.js';
+import { KEYBOARD } from '../../keyboards/keyboards.js';
 
 export async function showKeyboardCommand(ctx) {
 	ctx.reply('Клавиатура подключена', {

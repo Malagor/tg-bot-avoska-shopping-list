@@ -1,57 +1,93 @@
 import Telegraf from 'telegraf';
-import { getConfig } from './config/config.service.js';
+import * as scenes from './scenes/index.js';
+import { actionHandlerList } from './handlers/action-handler-list.js';
+import { commandHandlerList } from './handlers/command-handler-list.js';
+import { hearsHandlerList } from './handlers/hears-handler-list.js';
 import { getRequire } from './helpers/require-hook.js';
-import * as commands from './commands/index.js';
-import { KEYBOARD_BUTTON as kb } from './constants/keyboard.constants.js';
-import { addScenes } from './helpers/bot.helper.js';
+import { updateHandlerList } from './handlers/update-handler-list.js';
+
+const { Stage } = getRequire('telegraf');
 
 const LocalSession = getRequire('telegraf-session-local');
 
-export async function runBot() {
-	const bot = new Telegraf(getConfig('BOT_TOKEN'));
-	const stage = addScenes();
+export default class Bot {
+	constructor(token) {
+		this.bot = new Telegraf(token);
 
-	bot.use(new LocalSession({ database: 'session.json' }).middleware());
-	bot.use(stage.middleware());
+		this.init();
+	}
 
-	bot.start(commands.startCommand);
-	bot.help(commands.helpCommand);
+	init() {
+		this.bot.use(new LocalSession({ database: 'session.json' }).middleware());
+		this.bot.use(this.addScenes().middleware());
 
-	bot.hears(kb.Add, commands.addProductCommand);
-	bot.hears(kb.List, commands.listCommand);
-	bot.hears(kb.BuyMode, async ctx => {
-		await commands.listCommand(ctx, { isBuyMode: true });
-	});
-
-	// LISTS
-	bot.hears(kb.Back, commands.backCommand);
-	bot.hears(kb.GetAllLists, commands.allListCommand);
-	bot.hears(kb.ShowAllLists, commands.showAllListsCommand);
-	bot.hears(kb.ShowCurrentList, commands.currentListCommand);
-	bot.hears(kb.Create, commands.createListCommand);
-
-	// COMMANDS
-	bot.command('list', commands.listCommand);
-	bot.command('keyboard', commands.showKeyboardCommand);
-	bot.command('add', commands.addProductCommand);
-	bot.command('showLists', commands.allListCommand);
-
-	// ACTIONS
-	bot.action(/^edit-(.+)$/, commands.editCommand);
-	bot.action(/^buy-(.+)$/, commands.buyCommand);
-	bot.action(/^select-(.+)$/, commands.selectCurrentList);
-	bot.action(/^rename-(.+)$/, commands.renameListCommand);
-	bot.action(/^delete-(.+)$/, commands.deleteListCommand);
-
-	bot.launch()
-		.then(() => {
-			console.log('The bot is connected and working...');
-		})
-		.catch(e => {
+		this.addListeners().catch(e => {
 			console.log(e);
 		});
+	}
 
-	// Enable graceful stop
-	process.once('SIGINT', () => bot.stop('SIGINT'));
-	process.once('SIGTERM', () => bot.stop('SIGTERM'));
+	launch() {
+		this.bot
+			.launch()
+			.then(() => {
+				console.log('The bot is connected and working...');
+			})
+			.catch(e => {
+				console.log(e);
+			});
+
+		// Enable graceful stop
+		process.once('SIGINT', () => this.bot.stop('SIGINT'));
+		process.once('SIGTERM', () => this.bot.stop('SIGTERM'));
+	}
+
+	addScenes() {
+		const stages = [];
+
+		Object.keys(scenes).forEach(sc => {
+			stages.push(scenes[sc]);
+		});
+
+		return new Stage(stages);
+	}
+
+	async addListeners() {
+		await this.connectHears();
+		await this.connectCommands();
+		await this.connectActions();
+		await this.connectUpdateHandlers();
+	}
+
+	async connectActions() {
+		for (const action in actionHandlerList) {
+			this.bot.action(this.createTrigger(action), actionHandlerList[action]);
+		}
+	}
+
+	async connectCommands() {
+		for (const command in commandHandlerList) {
+			this.bot.command(command, commandHandlerList[command]);
+		}
+	}
+
+	async connectHears() {
+		for (const hears in hearsHandlerList) {
+			this.bot.hears(hears, hearsHandlerList[hears]);
+		}
+	}
+
+	async connectUpdateHandlers() {
+		for (const updateType in updateHandlerList) {
+			this.bot.on(updateType, updateHandlerList[updateType]);
+		}
+	}
+
+	/**
+	 *
+	 * @param {string} action
+	 * @return {RegExp}
+	 */
+	createTrigger(action) {
+		return new RegExp(`^${action}-(.+)$`);
+	}
 }

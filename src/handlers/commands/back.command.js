@@ -1,4 +1,4 @@
-import { KEYBOARD } from '../keyboards/keyboards.js';
+import { KEYBOARD } from '../../keyboards/keyboards.js';
 
 export async function backCommand(ctx) {
 	ctx.reply('Выберите комманду для работы', {

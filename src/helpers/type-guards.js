@@ -10,3 +10,7 @@ export function isQueryContext(ctx) {
 export function isMessageContext(ctx) {
 	return !!ctx?.update?.message;
 }
+
+export function isInlineQuery(ctx) {
+	return !!ctx?.update?.inline_query.id;
+}

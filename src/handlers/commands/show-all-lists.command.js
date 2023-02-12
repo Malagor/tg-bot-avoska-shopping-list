@@ -1,14 +1,14 @@
-import { getUserId, sendMessage } from '../helpers/context.helper.js';
-import { shoppingListService } from '../database/shopping-list.service.js';
-import { KEYBOARD } from '../keyboards/keyboards.js';
-import { formatListInfoHTML } from '../formatters/format-shopping-lists.js';
-import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
-import { KEYBOARD_BUTTON as kb } from '../constants/keyboard.constants.js';
+import { getUserId, sendMessage } from '../../helpers/context.helper.js';
+import { shoppingListService } from '../../database/shopping-list.service.js';
+import { KEYBOARD } from '../../keyboards/keyboards.js';
+import { formatListInfoHTML } from '../../formatters/format-shopping-lists.js';
+import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
+import { KEYBOARD_BUTTON as kb } from '../../constants/keyboard.constants.js';
 
 export async function showAllListsCommand(ctx) {
 	const userId = getUserId(ctx);
 
-	const lists = await shoppingListService.getAllShoppingListByUserId(userId);
+	const lists = await shoppingListService.getAllShoppingListsByUserId(userId);
 
 	if (!lists) {
 		await ctx.reply('У вас еще нет списков', {
@@ -50,5 +50,5 @@ async function sendShoppingLists(ctx, shoppingLists) {
 function isCurrent(ctx, list) {
 	const { session } = ctx;
 
-	return session[SESSION_FIELDS.ShoppingListId] === list.uuid;
+	return session[SESSION_FIELDS.CurrentListId] === list.uuid;
 }

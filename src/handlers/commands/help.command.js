@@ -1,4 +1,4 @@
-import { KEYBOARD } from '../keyboards/keyboards.js';
+import { KEYBOARD } from '../../keyboards/keyboards.js';
 
 export function helpCommand(ctx) {
 	ctx.reply(

@@ -37,7 +37,7 @@ function getCurrentKeyboard(listUuid) {
 	return Markup.inlineKeyboard([
 		Markup.callbackButton(kb.RenameList, `rename-${listUuid}`),
 		Markup.callbackButton(kb.ShareList, `share-${listUuid}`),
-		Markup.callbackButton(`!!! ${kb.DeleteList} !!!`, `delete-${listUuid}`),
+		Markup.callbackButton(`${kb.DeleteList}`, `delete-${listUuid}`),
 	]);
 }
 
@@ -54,7 +54,7 @@ function getShoppingListKeyboard(listUuid) {
 		],
 		[
 			Markup.callbackButton(kb.ShareList, `share-${listUuid}`),
-			Markup.callbackButton(`!!! ${kb.DeleteList} !!!`, `delete-${listUuid}`),
+			Markup.callbackButton(`${kb.DeleteList}`, `delete-${listUuid}`),
 		],
 	]);
 }

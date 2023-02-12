@@ -36,7 +36,7 @@ class ShoppingListService {
 	 * @param userId
 	 * @return {Promise<Array<ShoppingList>|null>}
 	 */
-	async getAllShoppingListByUserId(userId) {
+	async getAllShoppingListsByUserId(userId) {
 		try {
 			return this.repository.getAllLists(createQueryForShoppingLists(userId));
 		} catch (e) {

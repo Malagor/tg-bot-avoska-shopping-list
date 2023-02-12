@@ -1,4 +1,4 @@
-export async function editCommand(ctx) {
+export async function editAction(ctx) {
 	try {
 		await ctx.scene.enter('editProductScene');
 	} catch (e) {
