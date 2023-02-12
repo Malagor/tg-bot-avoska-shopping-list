@@ -1,8 +1,5 @@
-import { KEYBOARD } from '../../keyboards/keyboards.js';
-import { getRequire } from '../../helpers/require-hook.js';
-
-const { Extra } = getRequire('telegraf');
+import { sendMessage } from '../../helpers/context.helper.js';
 
 export async function allListCommand(ctx) {
-	ctx.reply('Страница работы со списками', Extra.markup(KEYBOARD.lists));
+	await sendMessage(ctx, 'Страница работы со списками', { kbName: 'lists' });
 }

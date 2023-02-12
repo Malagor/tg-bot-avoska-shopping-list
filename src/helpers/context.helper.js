@@ -116,8 +116,11 @@ export async function sendMessage(ctx, html, { kbName, kbArgs = '' } = {}) {
 	if (keyboard) {
 		await ctx.replyWithHTML(html, {
 			reply_markup: keyboard,
+			disable_notification: true,
 		});
 	} else {
-		await ctx.replyWithHTML(html);
+		await ctx.replyWithHTML(html, {
+			disable_notification: true,
+		});
 	}
 }

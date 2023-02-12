@@ -29,7 +29,9 @@ export async function sendSimpleProductList(ctx, products) {
 		html = 'Нет продуктов для отображения';
 	}
 
-	await ctx.replyWithHTML(html);
+	await ctx.replyWithHTML(html, {
+		disable_notification: true,
+	});
 }
 
 /**

@@ -61,7 +61,7 @@ async function receiveProducts(ctx) {
 async function addProducts(ctx, products) {
 	const { session } = ctx;
 
-	await shoppingListService.addProducts(session[SESSION_FIELDS.ShoppingListId], products);
+	await shoppingListService.addProducts(session[SESSION_FIELDS.CurrentListId], products);
 }
 
 function saveQueryId(ctx) {

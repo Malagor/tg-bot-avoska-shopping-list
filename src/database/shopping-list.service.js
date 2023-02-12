@@ -121,6 +121,34 @@ class ShoppingListService {
 
 	/**
 	 *
+	 * @param {string} listUuid
+	 * @param {string} name
+	 * @return {Promise<ShoppingList>}
+	 */
+	async updateListName(listUuid, name) {
+		try {
+			return this.repository.updateList(listUuid, { name });
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	/**
+	 *
+	 * @param {string} listUuid
+	 * @param {Array<number>} userIds
+	 * @return {Promise<ShoppingList>}
+	 */
+	async updateUsers(listUuid, userIds) {
+		try {
+			return this.repository.updateList(listUuid, { userIds });
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	/**
+	 *
 	 * @param {string} listId
 	 * @param {string} productUuid
 	 * @return {Promise<void>}
@@ -132,20 +160,6 @@ class ShoppingListService {
 			const productList = list.products.filter(p => p.uuid !== productUuid);
 
 			await this.repository.updateProducts(listId, productList);
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
-	/**
-	 *
-	 * @param {string} listUuid
-	 * @param {string} name
-	 * @return {Promise<ShoppingList>}
-	 */
-	async updateListName(listUuid, name) {
-		try {
-			return this.repository.updateList(listUuid, { name });
 		} catch (e) {
 			console.log(e);
 		}

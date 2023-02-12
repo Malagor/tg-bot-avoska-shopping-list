@@ -1,6 +1,5 @@
 import { getUserId, sendMessage } from '../../helpers/context.helper.js';
 import { shoppingListService } from '../../database/shopping-list.service.js';
-import { KEYBOARD } from '../../keyboards/keyboards.js';
 import { formatListInfoHTML } from '../../formatters/format-shopping-lists.js';
 import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 import { KEYBOARD_BUTTON as kb } from '../../constants/keyboard.constants.js';
@@ -11,9 +10,7 @@ export async function showAllListsCommand(ctx) {
 	const lists = await shoppingListService.getAllShoppingListsByUserId(userId);
 
 	if (!lists) {
-		await ctx.reply('У вас еще нет списков', {
-			reply_markup: KEYBOARD.lists,
-		});
+		await sendMessage(ctx, 'У вас еще нет списков', { kbName: 'lists' });
 	} else {
 		await sendShoppingLists(ctx, lists);
 	}
@@ -27,7 +24,7 @@ export async function showAllListsCommand(ctx) {
  */
 async function sendShoppingLists(ctx, shoppingLists) {
 	if (!shoppingLists.length) {
-		await sendMessage(ctx, `У вас нет списков. Список можно создать командой "<b>${kb.Create}</b>"`, {
+		await sendMessage(ctx, `У вас нет списков. Список можно создать командой "<b>${kb.NewList}</b>"`, {
 			kbName: 'lists',
 		});
 		return;
