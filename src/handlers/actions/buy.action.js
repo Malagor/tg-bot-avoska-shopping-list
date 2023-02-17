@@ -7,12 +7,12 @@ import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
  * @param ctx
  * @return {Promise<void>}
  */
-export async function buyCommand(ctx) {
+export async function buyAction(ctx) {
 	try {
 		const { session } = ctx;
 		const product = getText(ctx);
 
-		await shoppingListService.deleteProduct(session[SESSION_FIELDS.ShoppingListId], getAdditionDataFromQuery(ctx));
+		await shoppingListService.deleteProduct(session[SESSION_FIELDS.CurrentListId], getAdditionDataFromQuery(ctx));
 
 		await ctx.deleteMessage();
 

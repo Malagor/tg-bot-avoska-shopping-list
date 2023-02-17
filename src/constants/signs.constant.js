@@ -1,0 +1,16 @@
+export const icons = {
+	edit: '📝',
+	plus: '➕',
+	list: '📃',
+	buy: '🛒',
+	cancel: '❌',
+	buyMode: '📑',
+	back: '🏠',
+	lists: '📚',
+	share: '📢',
+	rename: '✏',
+	new: '🆕',
+	current: '📌',
+	warning: '‼',
+	private: '🔐',
+};

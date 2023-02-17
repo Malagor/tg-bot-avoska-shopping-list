@@ -50,7 +50,11 @@ async function receiveListName(ctx) {
  * @return {Promise<void>}
  */
 async function createList(ctx, name) {
-	const list = await shoppingListService.createList(name, helper.getUserId(ctx));
+	const userId = helper.getUserId(ctx);
+
+	saveUserId(ctx, userId);
+
+	const list = await shoppingListService.createList(name, userId);
 
 	if (!list) {
 		await helper.sendMessage(ctx, 'Не получилось создать новый список. Попробуйте через некоторое время', {
@@ -75,4 +79,13 @@ function saveCurrentListId(ctx, uuid) {
 	const { session } = ctx;
 
 	session[SESSION_FIELDS.CurrentListId] = uuid;
+}
+
+/**
+ *
+ * @param ctx
+ * @param {number} userId
+ */
+function saveUserId(ctx, userId) {
+	ctx.session[SESSION_FIELDS.UserId] = userId;
 }

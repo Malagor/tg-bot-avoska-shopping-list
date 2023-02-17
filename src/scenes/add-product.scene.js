@@ -55,7 +55,7 @@ async function receiveProducts(ctx) {
 /**
  *
  * @param ctx
- * @param {Array<Product>}products
+ * @param {Array<Product>} products
  * @return {Promise<void>}
  */
 async function addProducts(ctx, products) {

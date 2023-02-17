@@ -1,7 +1,6 @@
 export { addProductCommand } from './addProduct.command.js';
 export { allListCommand } from './all-list.command.js';
 export { backCommand } from './back.command.js';
-export { buyCommand } from './buy.command.js';
 export { createListCommand } from './create-list.command.js';
 export { helpCommand } from './help.command.js';
 export { getListCommandHandler } from './list.command.js';

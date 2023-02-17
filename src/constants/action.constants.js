@@ -4,4 +4,6 @@ export const ACTIONS = {
 	share: 'share',
 	delete: 'delete',
 	select: 'select',
+	private: 'private',
+	buy: 'buy',
 };

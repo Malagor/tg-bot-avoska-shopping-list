@@ -9,7 +9,7 @@ export async function selectCurrentListAction(ctx) {
 		if (!listUuid) {
 			await sendMessage(ctx, 'Не получен идентификатор списка в сообщении', {
 				kbName: 'lists',
-				kbArgs: listUuid,
+				listUuid,
 			});
 		}
 
@@ -17,7 +17,7 @@ export async function selectCurrentListAction(ctx) {
 
 		ctx.session[SESSION_FIELDS.CurrentListId] = list.uuid;
 
-		await sendMessage(ctx, `Список <b>${list.name}</b> теперь текущий.`, { kbName: 'lists', kbArgs: list.uuid });
+		await sendMessage(ctx, `Список <b>${list.name}</b> теперь текущий.`, { kbName: 'lists', list });
 	} catch (e) {
 		console.log(e);
 	}

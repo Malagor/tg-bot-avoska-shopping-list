@@ -17,6 +17,7 @@ export async function startCommand(ctx) {
 	}
 
 	ctx.session[SESSION_FIELDS.CurrentListId] = list.uuid;
+	ctx.session[SESSION_FIELDS.UserId] = helper.getUserId(ctx);
 
 	await helper.sendMessage(ctx, 'Welcome', { kbName: 'main' });
 }

@@ -5,7 +5,6 @@ import { SESSION_FIELDS } from '../constants/session-fields.constants.js';
 import { parseProduct } from '../helpers/parsers.js';
 import * as ctxHelper from '../helpers/context.helper.js';
 import * as sceneHelper from '../helpers/scenes.helper.js';
-import { formatProductHTML, formatProductText } from '../formatters/format-product-list.js';
 
 const WizardScene = getRequire('telegraf/scenes/wizard');
 
@@ -14,6 +13,7 @@ export const editProductScene = new WizardScene(
 	async ctx => {
 		try {
 			saveSessionData(ctx);
+			console.log(ctx.session[SESSION_FIELDS.ProductId]);
 
 			await receiveNewProduct(ctx);
 			return ctx.wizard.next();
@@ -48,33 +48,24 @@ async function receiveNewProduct(ctx) {
 /**
  *
  * @param ctx
- * @param product
+ * @param {Product} product
  * @return {Promise<void>}
  */
 async function updateProduct(ctx, product) {
 	try {
 		const { session } = ctx;
 
-		restorePreviousProductId(product, session[SESSION_FIELDS.ProductId]);
+		product.uuid = session[SESSION_FIELDS.ProductId];
 
 		await updateProductInDB(ctx, product);
 		await editTextProductInChat(ctx, product);
 		await sceneHelper.sendNotificationMessages(
 			ctx,
-			`Продукт изменен.\n${session[SESSION_FIELDS.ProductInfo]} => ${formatProductText(product)}`
+			`Продукт изменен.\n${session[SESSION_FIELDS.ProductInfo]} => ${product.toText()}`
 		);
 	} catch (e) {
 		console.log(e);
 	}
-}
-
-/**
- *
- * @param {Product} product
- * @param {string} oldId
- */
-function restorePreviousProductId(product, oldId) {
-	product.uuid = oldId;
 }
 
 /**
@@ -90,10 +81,10 @@ async function editTextProductInChat(ctx, product) {
 		session[SESSION_FIELDS.ChatId],
 		session[SESSION_FIELDS.MessageId],
 		session[SESSION_FIELDS.MessageId],
-		formatProductHTML(product),
+		product.toHtml(),
 		{
 			parse_mode: 'HTML',
-			reply_markup: KEYBOARD.product(product.uuid),
+			reply_markup: KEYBOARD.product({ product }),
 		}
 	);
 }
@@ -107,7 +98,7 @@ async function editTextProductInChat(ctx, product) {
 async function updateProductInDB(ctx, product) {
 	const { session } = ctx;
 
-	await shoppingListService.updateProduct(session[SESSION_FIELDS.ShoppingListId], product);
+	await shoppingListService.updateProduct(session[SESSION_FIELDS.CurrentListId], product);
 }
 
 function saveSessionData(ctx) {

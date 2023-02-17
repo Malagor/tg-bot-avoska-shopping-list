@@ -33,5 +33,5 @@ export async function sendCancelMessage(ctx, kbName = '') {
  * @return {boolean}
  */
 export function isCancel(text) {
-	return text === kb.Cancel || text === '/cancel';
+	return text === kb.cancel || text === '/cancel';
 }

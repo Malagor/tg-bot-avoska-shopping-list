@@ -1,9 +1,11 @@
-import { v4 as uuid } from 'uuid';
+import Product from '../models/Product.js';
+
 /**
  *
  * @param {string} products
  * @return {Array<Product>}
  */
+
 export function parseProductList(products) {
 	return products.split('\n').map(parseProduct);
 }
@@ -20,11 +22,7 @@ export function parseProduct(product) {
 
 	const title = arrayOfWords.join(' ').trim();
 
-	return {
-		uuid: uuid(),
-		title,
-		count,
-	};
+	return new Product({ title, count });
 }
 
 /**

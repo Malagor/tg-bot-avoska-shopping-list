@@ -1,62 +1,97 @@
 import { getRequire } from '../helpers/require-hook.js';
 import { KEYBOARD_BUTTON as kb } from '../constants/keyboard.constants.js';
+import { ACTIONS } from '../constants/action.constants.js';
+import { keyboardLayout } from '../helpers/keyboard.helper.js';
 
 const { Markup } = getRequire('telegraf');
 
 const mainKeyboard = Markup.keyboard([
-	[kb.List, kb.BuyMode],
-	[kb.Add, kb.GetAllLists],
+	[kb.list, kb.buyMode],
+	[kb.add, kb.getAllLists],
 ]).resize();
 
-const cancelKeyboard = Markup.keyboard([kb.Cancel]).resize();
+const cancelKeyboard = Markup.keyboard([kb.cancel]).resize();
 
 const listsKeyboard = Markup.keyboard([
-	[kb.ShowAllLists, kb.ShowCurrentList],
-	[kb.NewList, kb.Back],
+	[kb.showAllLists, kb.showCurrentList],
+	[kb.newList, kb.back],
 ]).resize();
 
-const warningKeyboard = Markup.keyboard([[kb.Yes, kb.Cancel]]).resize();
+const warningKeyboard = Markup.keyboard([[kb.yes, kb.cancel]]).resize();
 
 /**
  *
- * @param {string} productUuid
+ * @param {KeyboardOptions} productUuid
  * @return {Markup<InlineKeyboardMarkup> & InlineKeyboardMarkup}
  */
-export function getProductKeyboard(productUuid) {
+export function getProductKeyboard({ product }) {
 	return Markup.inlineKeyboard([
-		[Markup.callbackButton(kb.Edit, `edit-${productUuid}`), Markup.callbackButton(kb.Buy, `buy-${productUuid}`)],
+		[
+			Markup.callbackButton(kb.edit, `${ACTIONS.edit}-${product.uuid}`),
+			Markup.callbackButton(kb.buy, `${ACTIONS.buy}-${product.uuid}`),
+		],
 	]);
 }
 
 /**
  *
- * @param {string} listUuid - id current list
+ * @param {KeyboardOptions} options
  * @return {Markup<InlineKeyboardMarkup> & InlineKeyboardMarkup}
  */
-function getCurrentKeyboard(listUuid) {
-	return Markup.inlineKeyboard([
-		Markup.callbackButton(kb.RenameList, `rename-${listUuid}`),
-		Markup.callbackButton(kb.ShareList, `share-${listUuid}`),
-		Markup.callbackButton(`${kb.DeleteList}`, `delete-${listUuid}`),
-	]);
+function getCurrentKeyboard({ list, userId }) {
+	if (!list) {
+		return Markup.inlineKeyboard([]);
+	}
+
+	const { uuid } = list;
+
+	const buttons = [];
+
+	if (list.isOwner(userId)) {
+		buttons.push(Markup.callbackButton(kb.renameList, `${ACTIONS.rename}-${uuid}`));
+		buttons.push(getShareToggleButton(list));
+	}
+
+	buttons.push(Markup.callbackButton(kb.deleteList, `${ACTIONS.delete}-${uuid}`));
+
+	return Markup.inlineKeyboard(keyboardLayout(buttons));
 }
 
 /**
  *
- * @param {string} listUuid
+ * @param {KeyboardOptions} options
  * @return {Markup<InlineKeyboardMarkup> & InlineKeyboardMarkup}
  */
-function getShoppingListKeyboard(listUuid) {
-	return Markup.inlineKeyboard([
-		[
-			Markup.callbackButton(kb.SelectCurrent, `select-${listUuid}`),
-			Markup.callbackButton(kb.RenameList, `rename-${listUuid}`),
-		],
-		[
-			Markup.callbackButton(kb.ShareList, `share-${listUuid}`),
-			Markup.callbackButton(`${kb.DeleteList}`, `delete-${listUuid}`),
-		],
-	]);
+function getShoppingListKeyboard({ list, userId, currentListId }) {
+	if (!list) {
+		return Markup.inlineKeyboard([]);
+	}
+
+	const buttons = [];
+
+	if (!list.isCurrent(currentListId)) {
+		buttons.push(Markup.callbackButton(kb.selectCurrent, `${ACTIONS.select}-${list.uuid}`));
+	}
+
+	if (list.isOwner(userId)) {
+		buttons.push(Markup.callbackButton(kb.renameList, `${ACTIONS.rename}-${list.uuid}`));
+		buttons.push(getShareToggleButton(list));
+	}
+	buttons.push(Markup.callbackButton(kb.deleteList, `${ACTIONS.delete}-${list.uuid}`));
+
+	return Markup.inlineKeyboard(keyboardLayout(buttons));
+}
+
+/**
+ *
+ * @param {ShoppingList} list
+ */
+function getShareToggleButton(list) {
+	const { uuid } = list;
+
+	return list.isPrivate()
+		? Markup.callbackButton(kb.shareList, `${ACTIONS.share}-${uuid}`)
+		: Markup.callbackButton(kb.private, `${ACTIONS.private}-${uuid}`);
 }
 
 export const KEYBOARD = {

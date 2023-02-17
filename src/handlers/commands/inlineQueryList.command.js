@@ -1,6 +1,6 @@
 import { shoppingListService } from '../../database/shopping-list.service.js';
 import { getUserId } from '../../helpers/context.helper.js';
-import { formatInlineQueryAnswer } from '../../formatters/format-inline-product-list.js';
+import { getInlineQueryAnswer } from '../../helpers/shopping-list.helper.js';
 
 export async function inlineQueryListCommand(ctx) {
 	const userId = getUserId(ctx);
@@ -9,7 +9,7 @@ export async function inlineQueryListCommand(ctx) {
 	if (!lists) {
 		await sendNoResultMessage(ctx);
 	} else {
-		const answerArray = formatInlineQueryAnswer(lists);
+		const answerArray = getInlineQueryAnswer(lists);
 		ctx.answerInlineQuery(answerArray, {
 			cache_time: 0,
 		});

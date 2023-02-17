@@ -71,7 +71,7 @@ export function getQueryId(ctx) {
  * @return {string | undefined}
  */
 export function getAdditionDataFromQuery(ctx) {
-	return ctx.match[1];
+	return ctx?.match[1];
 }
 
 /**
@@ -94,33 +94,44 @@ export function getText(ctx) {
 }
 
 /**
+ * @typedef KeyboardOptions
+ * @type {Object}
+ * @property {string} [kbName] - keyboard name
+ * @property {ShoppingList} [list]
+ * @property {Product} [product]
+ * @property {number} [userId]
+ * @property {string} [currentListId]
+ */
+
+/**
  *
  * @param ctx
  * @param {string} html
- * @param {{kbName: string, kbArgs: string}} options - keyboard options
+ * @param {KeyboardOptions} options - keyboard options
  * @return {Promise<void>}
  */
-export async function sendMessage(ctx, html, { kbName, kbArgs = '' } = {}) {
-	let keyboard = KEYBOARD[kbName];
+export async function sendMessage(ctx, html, options = {}) {
+	const extra = {
+		disable_notification: true,
+	};
 
-	if (!keyboard) {
-		console.error('Не найдена клавиатура для сообщения');
-	} else {
-		if (typeof keyboard === 'function') {
-			keyboard = KEYBOARD[kbName](kbArgs);
-		} else {
-			keyboard = KEYBOARD[kbName];
-		}
-	}
+	addKeyboard(extra, options);
+
+	await ctx.replyWithHTML(html, extra);
+}
+
+/**
+ *
+ * @param {{
+ *     disable_notification: boolean,
+ *     reply_markup
+ * }} extra
+ * @param {KeyboardOptions} options
+ */
+function addKeyboard(extra, options) {
+	const keyboard = KEYBOARD[options.kbName];
 
 	if (keyboard) {
-		await ctx.replyWithHTML(html, {
-			reply_markup: keyboard,
-			disable_notification: true,
-		});
-	} else {
-		await ctx.replyWithHTML(html, {
-			disable_notification: true,
-		});
+		extra.reply_markup = typeof keyboard === 'function' ? keyboard(options) : keyboard;
 	}
 }

@@ -1,5 +1,5 @@
 import { shoppingListService } from '../../database/shopping-list.service.js';
-import { sendProductListWithButtons, sendSimpleProductList } from '../../helpers/shopping-list.helper.js';
+import { sendProductListWithActions, sendSimpleProductList } from '../../helpers/shopping-list.helper.js';
 import * as helper from '../../helpers/context.helper.js';
 import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 
@@ -12,7 +12,10 @@ export const getListCommandHandler =
 	({ isBuyMode } = {}) =>
 	async ctx => {
 		try {
-			const listUuid = ctx.session[SESSION_FIELDS.CurrentListId];
+			const { session } = ctx;
+			const listUuid = session[SESSION_FIELDS.CurrentListId];
+
+			session[SESSION_FIELDS.UserId] = helper.getUserId(ctx);
 
 			let list = await shoppingListService.getShoppingListByUuid(listUuid);
 
@@ -36,7 +39,7 @@ export const getListCommandHandler =
 			await sendListTitle(ctx, list);
 
 			if (isBuyMode) {
-				await sendProductListWithButtons(ctx, list.products);
+				await sendProductListWithActions(ctx, list.products);
 			} else {
 				await sendSimpleProductList(ctx, list.products);
 			}

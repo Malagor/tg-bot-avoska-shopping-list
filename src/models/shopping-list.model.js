@@ -1,23 +1,23 @@
 import mongoose, { Schema } from 'mongoose';
+import ShoppingList from './ShoppingList.js';
+import Product from './Product.js';
 
-/**
- * @typedef Product
- * @type {object}
- * @property {string} uuid - an ID.
- * @property {string} title - title of product.
- * @property {number} count - count of product.
- */
+const productSchema = new Schema({
+	uuid: {
+		type: String,
+		required: true,
+		unique: true,
+	},
+	title: {
+		type: String,
+		required: true,
+	},
+	count: Number,
+});
 
-/**
- * @typedef ShoppingList
- * @type {object}
- * @property {string} uuid - an ID.
- * @property {string} name - title of product list.
- * @property {Array<number>} userIds - array of users who use this list.
- * @property {Array<Product>} products - array of products
- */
+productSchema.loadClass(Product);
 
-const ShoppingList = new Schema({
+const shoppingListSchema = new Schema({
 	uuid: {
 		type: String,
 		required: true,
@@ -31,20 +31,9 @@ const ShoppingList = new Schema({
 		type: [Number],
 		default: [],
 	},
-	products: [
-		{
-			uuid: {
-				type: String,
-				required: true,
-				unique: true,
-			},
-			title: {
-				type: String,
-				required: true,
-			},
-			count: Number,
-		},
-	],
+	products: [productSchema],
 });
 
-mongoose.model('shoppingLists', ShoppingList);
+shoppingListSchema.loadClass(ShoppingList);
+
+mongoose.model('shoppingLists', shoppingListSchema);

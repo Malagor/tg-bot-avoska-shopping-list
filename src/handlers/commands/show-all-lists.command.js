@@ -1,8 +1,8 @@
 import { getUserId, sendMessage } from '../../helpers/context.helper.js';
 import { shoppingListService } from '../../database/shopping-list.service.js';
-import { formatListInfoHTML } from '../../formatters/format-shopping-lists.js';
 import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 import { KEYBOARD_BUTTON as kb } from '../../constants/keyboard.constants.js';
+import { moveCurrentToTop } from '../../helpers/shopping-list.helper.js';
 
 export async function showAllListsCommand(ctx) {
 	const userId = getUserId(ctx);
@@ -24,7 +24,7 @@ export async function showAllListsCommand(ctx) {
  */
 async function sendShoppingLists(ctx, shoppingLists) {
 	if (!shoppingLists.length) {
-		await sendMessage(ctx, `У вас нет списков. Список можно создать командой "<b>${kb.NewList}</b>"`, {
+		await sendMessage(ctx, `У вас нет списков. Список можно создать командой "<b>${kb.newList}</b>"`, {
 			kbName: 'lists',
 		});
 		return;
@@ -32,20 +32,14 @@ async function sendShoppingLists(ctx, shoppingLists) {
 
 	await sendMessage(ctx, `Общее количество ваших списков: "<b>${shoppingLists.length}</b>"`, { kbName: 'lists' });
 
-	for (const list of shoppingLists) {
-		const html = formatListInfoHTML(list, { isCurrent: isCurrent(ctx, list) });
+	const currentListId = ctx.session[SESSION_FIELDS.CurrentListId];
+	const userId = ctx.session[SESSION_FIELDS.UserId];
 
-		await sendMessage(ctx, html, { kbName: 'shoppingList', kbArgs: list.uuid });
+	const sortedList = moveCurrentToTop(shoppingLists, currentListId);
+
+	for (const list of sortedList) {
+		const html = list.toHtml(currentListId, userId);
+
+		await sendMessage(ctx, html, { kbName: 'shoppingList', list, userId, currentListId });
 	}
-}
-
-/**
- *
- * @param ctx
- * @param {ShoppingList} list
- */
-function isCurrent(ctx, list) {
-	const { session } = ctx;
-
-	return session[SESSION_FIELDS.CurrentListId] === list.uuid;
 }
