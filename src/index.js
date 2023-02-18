@@ -13,7 +13,7 @@ mongoose
 		console.log('Connection to the database was successful!');
 	})
 	.then(async () => {
-		Bot.getInstance(getConfig('BOT_TOKEN'));
+		new Bot(getConfig('BOT_TOKEN')).launch();
 	})
 	.catch(e => {
 		console.log(e);
