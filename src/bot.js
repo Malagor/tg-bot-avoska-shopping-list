@@ -12,10 +12,20 @@ const { Stage } = getRequire('telegraf');
 const LocalSession = getRequire('telegraf-session-local');
 
 export default class Bot {
+	static instance;
+
 	constructor(token) {
 		this.bot = new Telegraf(token);
 
 		this.init();
+	}
+
+	static getInstance(token) {
+		if (!Bot.instance) {
+			Bot.instance = new Bot(token);
+		}
+
+		return Bot.instance;
 	}
 
 	init() {
@@ -28,6 +38,8 @@ export default class Bot {
 			this.bot.telegram.setMyCommands(botCommands).catch(e => {
 				throw new Error(`Не удалось задать комманды бота\n${e}`);
 			});
+
+			this.launch();
 		} catch (e) {
 			console.log(e);
 		}

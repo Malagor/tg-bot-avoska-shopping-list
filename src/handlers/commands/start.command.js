@@ -1,6 +1,7 @@
 import { shoppingListService } from '../../database/shopping-list.service.js';
 import { SESSION_FIELDS } from '../../constants/session-fields.constants.js';
 import * as helper from '../../helpers/context.helper.js';
+import { COMMANDS } from '../../constants/commands.constant.js';
 
 export async function startCommand(ctx) {
 	const { session } = ctx;
@@ -19,5 +20,9 @@ export async function startCommand(ctx) {
 	ctx.session[SESSION_FIELDS.CurrentListId] = list.uuid;
 	ctx.session[SESSION_FIELDS.UserId] = helper.getUserId(ctx);
 
-	await helper.sendMessage(ctx, 'Welcome', { kbName: 'main' });
+	const text =
+		'Привет. Это бот для составления списков продуктов. Списками можно делиться с другими людьми и вести их совместно или пользоваться самому.\n' +
+		`Для начала можно перейти на страницу списков \/${COMMANDS.showLists} и там создать новый список.`;
+
+	await helper.sendMessage(ctx, text, { kbName: 'main' });
 }

@@ -32,7 +32,7 @@ export const getListCommandHandler =
 			saveCurrentListId(ctx, list.uuid);
 
 			if (!list.products.length) {
-				await helper.sendMessage(ctx, 'Нет списка продуктов для отображения', { kbName: 'main' });
+				await helper.sendMessage(ctx, 'Нет продуктов для отображения', { kbName: 'main' });
 				return;
 			}
 
