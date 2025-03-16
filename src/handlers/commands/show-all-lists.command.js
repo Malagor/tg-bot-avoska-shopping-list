@@ -38,8 +38,10 @@ async function sendShoppingLists(ctx, shoppingLists) {
 	const sortedList = moveCurrentToTop(shoppingLists, currentListId);
 
 	for (const list of sortedList) {
-		const html = list.toHtml(currentListId, userId);
+		if (list?.toHtml) {
+			const html = list.toHtml(currentListId, userId);
 
-		await sendMessage(ctx, html, { kbName: 'shoppingList', list, userId, currentListId });
+			await sendMessage(ctx, html, { kbName: 'shoppingList', list, userId, currentListId });
+		}
 	}
 }

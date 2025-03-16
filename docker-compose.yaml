@@ -1,0 +1,26 @@
+services:
+  bot:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      DB_URL: mongodb://mongo:27017
+      DB_NAME: ${DB_NAME}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_USER: ${MONGODB_USER}
+    depends_on:
+      - mongo
+    volumes:
+      - /app/node-modules/
+      - ./:/app
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+volumes:
+  mongodb_data:

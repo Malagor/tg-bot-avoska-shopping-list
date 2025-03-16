@@ -108,4 +108,7 @@ dist
 .idea
 .idea/
 
+.platform
+.platform/
+
 session.json
